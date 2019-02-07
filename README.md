@@ -11,3 +11,7 @@ Without any modification:
 When I modified code:
 
 ![foto2](img/img2.png)
+
+If I use stockLimit=3 :
+
+![foto3](img/img3.png)
