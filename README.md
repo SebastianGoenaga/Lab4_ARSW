@@ -5,6 +5,8 @@ En este laboratorio se trabajo la integración entre Heroku, GitHub, un framewor
 ## Part l
 
 Without any modification:
+
 ![foto1](img/img1.png)
+
 When I modified code:
 ![foto2](img/img2.png)
