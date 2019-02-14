@@ -35,6 +35,9 @@ public class ControlFrame extends JFrame {
     private JLabel statisticsLabel;
     private JScrollPane scrollPane;
     private JTextField numOfImmortals;
+    
+    private Boolean flagSum;
+    private Boolean flagStop;
 
     /**
      * Launch the application.
@@ -51,6 +54,14 @@ public class ControlFrame extends JFrame {
             }
         });
     }
+    
+    public Boolean getFlagStop() {
+		return flagStop;
+	}
+    
+    public Boolean getFlagSum() {
+		return flagSum;
+	}
 
     /**
      * Create the frame.
@@ -69,7 +80,9 @@ public class ControlFrame extends JFrame {
         final JButton btnStart = new JButton("Start");
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+            	
+            	flagStop = true;
+            	flagSum = false;
                 immortals = setupInmortals();
 
                 if (immortals != null) {
@@ -91,15 +104,22 @@ public class ControlFrame extends JFrame {
                 /*
 				 * COMPLETAR
                  */
+            	
+            	flagSum = true;
+            	
                 int sum = 0;
                 for (Immortal im : immortals) {
-                    sum += im.getHealth();
+                	synchronized (im) {
+                		im.pause();
+                		sum += im.getHealth();
+					}
                 }
 
                 statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
                 
+                flagSum = false;
                 
-
+                
             }
         });
         toolBar.add(btnPauseAndCheck);
@@ -111,6 +131,10 @@ public class ControlFrame extends JFrame {
                 /**
                  * IMPLEMENTAR
                  */
+            	
+            	for (Immortal immortal : immortals) {
+					immortal.resumeThreads();
+				}
 
             }
         });
