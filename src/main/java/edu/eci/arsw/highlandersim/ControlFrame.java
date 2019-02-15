@@ -81,8 +81,6 @@ public class ControlFrame extends JFrame {
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	
-            	flagStop = true;
-            	flagSum = false;
                 immortals = setupInmortals();
 
                 if (immortals != null) {
@@ -105,14 +103,9 @@ public class ControlFrame extends JFrame {
 				 * COMPLETAR
                  */
             	
-            	flagSum = true;
-            	
                 int sum = 0;
                 for (Immortal im : immortals) {
-                	synchronized (im) {
-                		im.pause();
                 		sum += im.getHealth();
-					}
                 }
 
                 statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
@@ -132,9 +125,7 @@ public class ControlFrame extends JFrame {
                  * IMPLEMENTAR
                  */
             	
-            	for (Immortal immortal : immortals) {
-					immortal.resumeThreads();
-				}
+            	
 
             }
         });

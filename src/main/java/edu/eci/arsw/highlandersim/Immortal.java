@@ -7,20 +7,14 @@ import java.util.ResourceBundle.Control;
 public class Immortal extends Thread {
 
 	private ImmortalUpdateReportCallback updateCallback = null;
-
 	private int health;
-
 	private int defaultDamageValue;
-	
-	private boolean isPaused;
-	private boolean stop;
-
 	private final List<Immortal> immortalsPopulation;
-
 	private final String name;
-
 	private final Random r = new Random(System.currentTimeMillis());
-
+	
+	private volatile Boolean fighting = false;
+	
 	public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue,
 			ImmortalUpdateReportCallback ucb) {
 		super(name);
@@ -29,14 +23,12 @@ public class Immortal extends Thread {
 		this.immortalsPopulation = immortalsPopulation;
 		this.health = health;
 		this.defaultDamageValue = defaultDamageValue;
-		this.isPaused = false;
-		this.stop = false;
 		
 	}
 
 	public void run() {
 
-		while (!stop) {
+		while (true) {
 			Immortal im;
 
 			int myIndex = immortalsPopulation.indexOf(this);
@@ -50,36 +42,35 @@ public class Immortal extends Thread {
 
 			im = immortalsPopulation.get(nextFighterIndex);
 			
-			if (isPaused) {
-				synchronized (this) {
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+			while (im.fighting) {
+				try {
+					im.fighting.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 			
 			this.fight(im);
-
+			
+			
 		}
 
-	}
-	
-	public void pause() {
-
-		isPaused = true;
-	}
-
-	public synchronized void resumeThreads() {
-		isPaused = false;
-		notifyAll();
 	}
 
 	public void fight(Immortal i2) {
 
 		if (i2.getHealth() > 0) {
+			while (i2.fighting) {
+				try {
+					i2.fighting.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			fighting = true;
 			i2.changeHealth(i2.getHealth() - defaultDamageValue);
+			fighting = false;
+			fighting.notifyAll();
 			this.health += defaultDamageValue;
 			updateCallback.processReport("Fight: " + this + " vs " + i2 + "\n");
 		} else {
